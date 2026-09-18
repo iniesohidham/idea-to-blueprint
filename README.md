@@ -6,6 +6,8 @@
 
 It is built for people who want to do **agentic engineering**, not vibe coding.
 
+**[See the landing page →](https://iniesohidham.github.io/idea-to-blueprint/)**
+
 ```
 /idea-to-blueprint  I want a Telegram bot that helps freelancers track invoices and nudges late clients.
 ```
