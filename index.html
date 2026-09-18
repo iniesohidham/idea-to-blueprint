@@ -318,6 +318,72 @@ footer a { color: var(--muted); }
 footer a:hover { color: var(--text); }
 footer nav { display: flex; gap: 22px; }
 
+/* ── Refinements: response, materials, continuous feedback ── */
+:root { --spring: cubic-bezier(.22, 1, .36, 1); }
+@supports (transition-timing-function: linear(0, 1)) {
+  /* critically damped spring: no overshoot, starts fast, settles gently */
+  :root { --spring: linear(0, 0.0827, 0.2459, 0.4168, 0.5663, 0.6861, 0.7773, 0.8444, 0.8926, 0.9266, 0.9503, 0.9665, 0.9776, 0.9851, 0.9901, 0.9935, 0.9957, 0.9972, 0.9982, 0.9988, 1); }
+}
+html { -webkit-tap-highlight-color: transparent; }
+a, button { touch-action: manipulation; }
+::selection { background: rgba(77,163,255,.35); }
+h1, h2, h3, h4 { text-wrap: balance; }
+p { text-wrap: pretty; }
+section[id] { scroll-margin-top: 40px; }
+
+.reveal { transition-timing-function: var(--spring); transition-duration: 1s; }
+
+/* Hero paints without waiting for script */
+.hero .reveal { animation: rise 1s var(--spring) both; animation-delay: var(--d, 0ms); }
+.hero .terminal.reveal { animation-name: materialize; animation-duration: 1.2s; }
+@keyframes rise { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+/* A material arrives: blur and scale resolve together, not a plain fade */
+@keyframes materialize { from { opacity: 0; transform: translateY(44px) scale(.955); filter: blur(14px); } to { opacity: 1; transform: none; filter: blur(0); } }
+
+/* Nav: no chrome until content scrolls beneath it */
+.nav { background: transparent; backdrop-filter: none; -webkit-backdrop-filter: none; border-bottom-color: transparent; transition: background .35s ease, border-color .35s ease; }
+.nav.scrolled { background: rgba(0,0,0,.62); backdrop-filter: saturate(180%) blur(20px); -webkit-backdrop-filter: saturate(180%) blur(20px); border-bottom-color: var(--line); }
+.nav-links a[aria-current="true"] { color: var(--text); }
+
+/* Paper section floats as a sheet instead of a hard band */
+.paper { margin-inline: clamp(8px, 1.4vw, 20px); border-radius: clamp(28px, 4vw, 52px); }
+
+/* Surfaces catch light under the pointer */
+.spot { position: relative; overflow: hidden; isolation: isolate; }
+.spot::before {
+  content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: 0;
+  background: radial-gradient(440px circle at var(--mx, 50%) var(--my, 0%), rgba(255,255,255,.075), transparent 62%);
+  transition: opacity .4s ease;
+}
+.spot { transition: border-color .4s ease; }
+@media (hover: hover) {
+  .spot:hover::before { opacity: 1; }
+  .spot:hover { border-color: var(--line-strong); }
+}
+
+/* Story paragraph lights up 1:1 with scroll */
+.story .w { opacity: .2; }
+
+/* Tabs: one selection surface that travels between options */
+.tabs { position: relative; isolation: isolate; }
+.tabs button[aria-selected="true"] { background: none; color: var(--muted); }
+.tabs-on {
+  position: absolute; inset: 4px; display: flex; border-radius: 999px; background: var(--text); pointer-events: none; z-index: 1;
+  clip-path: inset(0 var(--r, 66%) 0 var(--l, 0%) round 999px);
+  transition: clip-path .5s var(--spring);
+}
+.tabs-on span { font: 600 .88rem var(--sans); color: #000; padding: 9px 18px; white-space: nowrap; }
+.tabs.no-anim .tabs-on { transition: none; }
+.panel.swap { animation: panel-in .45s var(--spring) both; }
+@keyframes panel-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+/* Comfortable targets on touch */
+@media (pointer: coarse) {
+  .tabs button, .tabs-on span { padding-block: 13px; }
+  .copy { min-height: 44px; }
+  .pill { padding: 11px 18px; }
+}
+
 :focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 6px; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -325,9 +391,13 @@ footer nav { display: flex; gap: 22px; }
   .reveal, .term-out div { transform: none !important; transition: opacity .2s ease !important; }
   .caret { animation: none; }
   .btn-ghost span { transition: none; }
+  .hero .reveal, .panel.swap { animation: fade .2s ease both !important; }
+  .tabs-on { transition: none; }
+  .story .w { opacity: 1 !important; }
 }
+@keyframes fade { from { opacity: 0; } to { opacity: 1; } }
 @media (prefers-reduced-transparency: reduce) {
-  .nav { background: #000; backdrop-filter: none; -webkit-backdrop-filter: none; }
+  .nav.scrolled { background: #000; backdrop-filter: none; -webkit-backdrop-filter: none; }
   .terminal { background: var(--panel); backdrop-filter: none; -webkit-backdrop-filter: none; }
 }
 @media (prefers-contrast: more) {
@@ -384,10 +454,10 @@ footer nav { display: flex; gap: 22px; }
 </section>
 
 <!-- 2. The villain -->
-<section class="problem">
+<section class="problem" id="problem">
   <div class="wrap">
     <h2 class="headline reveal"><span class="strike">Your agent isn't hallucinating.</span><br>It's guessing.</h2>
-    <p class="lede reveal" style="--d:100ms">A coding agent starts every session knowing exactly two things: your repo and your prompt. Everything you left out, it fills with something plausible. Each guess looks fine on its own. Together they add up to a product nobody designed.</p>
+    <p class="lede story" id="story">A coding agent starts every session knowing exactly two things: your repo and your prompt. Everything you left out, it fills with something plausible. Each guess looks fine on its own. Together they add up to a product nobody designed.</p>
     <div class="cards">
       <div class="card reveal"><span class="k">GUESS 01</span><h3>It guesses the stack.</h3><p>Whatever it reaches for first. A version from its training data. An API that was renamed a year ago.</p></div>
       <div class="card reveal" style="--d:90ms"><span class="k">GUESS 02</span><h3>It guesses the spec.</h3><p>What happens when the payment fails twice? When two people edit at once? You never said. So it decided.</p></div>
@@ -688,6 +758,70 @@ footer nav { display: flex; gap: 22px; }
     items.forEach(function (el) { io.observe(el); });
   }
 
+
+  // Nav material appears only once content is beneath it
+  var nav = document.querySelector('.nav');
+  var ticking = false;
+  function onScroll() {
+    if (ticking) return; ticking = true;
+    requestAnimationFrame(function () {
+      ticking = false;
+      nav.classList.toggle('scrolled', window.scrollY > 8);
+      story();
+    });
+  }
+  window.addEventListener('scroll', onScroll, { passive: true });
+  window.addEventListener('resize', onScroll, { passive: true });
+
+  // Wayfinding: mark the section you are in
+  var links = Array.prototype.slice.call(document.querySelectorAll('.nav-links a[href^="#"]:not(.pill)'));
+  if ('IntersectionObserver' in window) {
+    var sio = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        links.forEach(function (a) { a.setAttribute('aria-current', a.getAttribute('href') === '#' + e.target.id); });
+      });
+    }, { rootMargin: '-45% 0px -50% 0px' });
+    document.querySelectorAll('section[id]').forEach(function (sec) { sio.observe(sec); });
+  }
+
+  // Story paragraph: words light up continuously with scroll, and dim again when you go back
+  var storyEl = document.getElementById('story'), words = [];
+  if (storyEl && !reduce) {
+    storyEl.innerHTML = storyEl.textContent.trim().split(/\s+/).map(function (w) { return '<span class="w">' + w + '</span>'; }).join(' ');
+    words = Array.prototype.slice.call(storyEl.querySelectorAll('.w'));
+  }
+  function story() {
+    if (!words.length) return;
+    var r = storyEl.getBoundingClientRect(), vh = window.innerHeight;
+    if (r.bottom < -vh || r.top > vh * 2) return;
+    var p = (vh * 0.86 - r.top) / (r.height + vh * 0.36);
+    var lit = Math.max(0, Math.min(1, p)) * (words.length + 4);
+    for (var i = 0; i < words.length; i++) {
+      words[i].style.opacity = 0.2 + 0.8 * Math.max(0, Math.min(1, (lit - i) / 4));
+    }
+  }
+  onScroll();
+
+  // Surfaces catch light under the pointer
+  var spots = document.querySelectorAll('.card, .tag-card, .step, .must > div');
+  spots.forEach(function (el) { el.classList.add('spot'); });
+  if (window.matchMedia('(hover: hover)').matches) {
+    var pending = null;
+    document.addEventListener('pointermove', function (e) {
+      var el = e.target.closest && e.target.closest('.spot');
+      if (!el) return;
+      pending = { el: el, x: e.clientX, y: e.clientY };
+      requestAnimationFrame(function () {
+        if (!pending) return;
+        var b = pending.el.getBoundingClientRect();
+        pending.el.style.setProperty('--mx', (pending.x - b.left) + 'px');
+        pending.el.style.setProperty('--my', (pending.y - b.top) + 'px');
+        pending = null;
+      });
+    }, { passive: true });
+  }
+
   // Terminal typing
   var typed = document.getElementById('typed');
   var lines = document.querySelectorAll('#out div');
@@ -713,14 +847,34 @@ footer nav { display: flex; gap: 22px; }
 
   // Tabs
   var tabs = Array.prototype.slice.call(document.querySelectorAll('[role="tab"]'));
-  function select(tab) {
-    tabs.forEach(function (t) {
-      var on = t === tab;
-      t.setAttribute('aria-selected', on);
-      t.tabIndex = on ? 0 : -1;
-      document.getElementById(t.getAttribute('aria-controls')).hidden = !on;
-    });
+  var tablist = document.querySelector('.tabs');
+  var on = document.createElement('div');
+  on.className = 'tabs-on'; on.setAttribute('aria-hidden', 'true');
+  tabs.forEach(function (t) { var sp = document.createElement('span'); sp.textContent = t.textContent; on.appendChild(sp); });
+  tablist.appendChild(on);
+  function place(tab) {
+    var box = on.getBoundingClientRect(), b = tab.getBoundingClientRect();
+    if (!box.width) return;
+    on.style.setProperty('--l', ((b.left - box.left) / box.width * 100) + '%');
+    on.style.setProperty('--r', ((box.right - b.right) / box.width * 100) + '%');
   }
+  function select(tab, animate) {
+    tabs.forEach(function (t) {
+      var sel = t === tab;
+      t.setAttribute('aria-selected', sel);
+      t.tabIndex = sel ? 0 : -1;
+      var panel = document.getElementById(t.getAttribute('aria-controls'));
+      panel.hidden = !sel;
+      panel.classList.toggle('swap', sel && animate !== false);
+    });
+    place(tab);
+  }
+  function current() { return tabs.filter(function (t) { return t.getAttribute('aria-selected') === 'true'; })[0]; }
+  tablist.classList.add('no-anim');
+  select(current(), false);
+  requestAnimationFrame(function () { requestAnimationFrame(function () { tablist.classList.remove('no-anim'); }); });
+  window.addEventListener('resize', function () { place(current()); }, { passive: true });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { place(current()); });
   tabs.forEach(function (t, idx) {
     t.addEventListener('click', function () { select(t); });
     t.addEventListener('keydown', function (e) {
