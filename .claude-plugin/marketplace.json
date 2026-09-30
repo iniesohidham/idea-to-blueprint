@@ -1,0 +1,16 @@
+{
+  "name": "idea-to-blueprint",
+  "description": "The idea-to-blueprint skill: raw product idea to an evidence-backed build blueprint for Claude Code and Codex.",
+  "owner": {
+    "name": "iniesohidham",
+    "url": "https://github.com/iniesohidham"
+  },
+  "plugins": [
+    {
+      "name": "idea-to-blueprint",
+      "source": "./",
+      "description": "Raw idea in, evidence-backed build blueprint out. Research, architecture, pinned stack, epics, stories, acceptance criteria and a one-epic-per-session build protocol.",
+      "category": "productivity"
+    }
+  ]
+}

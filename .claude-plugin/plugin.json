@@ -1,0 +1,26 @@
+{
+  "name": "idea-to-blueprint",
+  "displayName": "Idea to Blueprint",
+  "version": "1.1.0",
+  "description": "Raw idea in, evidence-backed build blueprint out: intake, live web research, architecture and a pinned stack, then epics, stories and Given/When/Then acceptance criteria your coding agent builds one epic per fresh session.",
+  "author": {
+    "name": "iniesohidham",
+    "url": "https://github.com/iniesohidham"
+  },
+  "homepage": "https://iniesohidham.github.io/idea-to-blueprint/",
+  "repository": "https://github.com/iniesohidham/idea-to-blueprint",
+  "license": "MIT",
+  "keywords": [
+    "prd",
+    "spec",
+    "blueprint",
+    "product-requirements",
+    "architecture",
+    "tech-stack",
+    "epics",
+    "user-stories",
+    "acceptance-criteria",
+    "spec-driven-development",
+    "agentic-engineering"
+  ]
+}

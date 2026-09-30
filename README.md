@@ -1,6 +1,14 @@
 # idea-to-blueprint
 
+[![GitHub stars](https://img.shields.io/github/stars/iniesohidham/idea-to-blueprint?style=flat&logo=github)](https://github.com/iniesohidham/idea-to-blueprint/stargazers)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Works with](https://img.shields.io/badge/works%20with-Claude%20Code%20·%20Codex%20·%20claude.ai-4da3ff)](#1-install-the-skill)
+
 **Two paragraphs of raw idea in. One evidence-backed build blueprint out. Then your coding agent ships it epic by epic, without guessing.**
+
+```bash
+npx skills add iniesohidham/idea-to-blueprint -g
+```
 
 `idea-to-blueprint` is an agent skill for **Claude Code**, **Codex** and **claude.ai**. You describe a product in plain words (or drop in a project brief). The skill interviews you, researches the market and the stack on the live web, makes the architecture decisions, and writes a single `.md` file detailed enough that a fresh agent session can build any epic from it with nothing else to go on.
 
@@ -65,21 +73,38 @@ The flow is deliberately **waterfall**. All the thinking, research and decisions
 
 ### 1. Install the skill
 
-**Claude Code** (personal skill, available in every project):
+**One command, any agent.** Installs for every coding agent the [skills CLI](https://github.com/vercel-labs/skills) finds on your machine (Claude Code, Codex, Cursor and more). `-g` makes it available in every project; drop it to install into the current project only.
+
+```bash
+npx skills add iniesohidham/idea-to-blueprint -g
+```
+
+**Claude Code plugin.** Installs from this repo's marketplace and updates with `claude plugin update`. Needs Claude Code v2.1.275 or later. As a plugin, the command is `/idea-to-blueprint:idea-to-blueprint`.
+
+```text
+/plugin install idea-to-blueprint --marketplace iniesohidham/idea-to-blueprint
+```
+
+**claude.ai** (web or desktop): download `idea-to-blueprint.zip` from the [latest release](https://github.com/iniesohidham/idea-to-blueprint/releases/latest), then upload it under *Settings → Capabilities → Skills*.
+
+<details>
+<summary>Manual install with git clone</summary>
+
+Claude Code (personal skill, available in every project):
 
 ```bash
 git clone https://github.com/iniesohidham/idea-to-blueprint ~/.claude/skills/idea-to-blueprint
 ```
 
-**Codex** (CLI or IDE extension):
+Codex (CLI or IDE extension):
 
 ```bash
 git clone https://github.com/iniesohidham/idea-to-blueprint ~/.agents/skills/idea-to-blueprint
 ```
 
-**claude.ai** (web or desktop): download the zip from [Releases](https://github.com/iniesohidham/idea-to-blueprint/releases), then upload it under *Settings → Capabilities → Skills*.
+To scope it to one project instead, clone into `.claude/skills/` (Claude Code) or `.agents/skills/` (Codex) inside that repo. Update later with `git pull` in that folder.
 
-To scope it to one project instead, clone into `.claude/skills/` (Claude Code) or `.agents/skills/` (Codex) inside that repo.
+</details>
 
 ### 2. Generate the blueprint
 
@@ -87,7 +112,7 @@ To scope it to one project instead, clone into `.claude/skills/` (Claude Code) o
 
 | Tool | How to invoke |
 |---|---|
-| Claude Code | `/idea-to-blueprint <your idea>` |
+| Claude Code | `/idea-to-blueprint <your idea>` (`/idea-to-blueprint:idea-to-blueprint` if installed as a plugin) |
 | Codex | `$idea-to-blueprint <your idea>` |
 | claude.ai | Just describe the idea and ask for a blueprint. The skill triggers on its own |
 
