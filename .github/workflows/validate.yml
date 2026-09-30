@@ -11,8 +11,7 @@ jobs:
       - uses: actions/checkout@v7
         with:
           path: idea-to-blueprint
-      - uses: astral-sh/setup-uv@v10
       - name: Validate SKILL.md against the Agent Skills spec
-        run: uvx --from "git+https://github.com/agentskills/agentskills#subdirectory=skills-ref" skills-ref validate idea-to-blueprint
+        run: pipx run --spec "git+https://github.com/agentskills/agentskills#subdirectory=skills-ref" skills-ref validate idea-to-blueprint
       - name: Linter still runs
         run: python3 idea-to-blueprint/scripts/lint_blueprint.py --help
