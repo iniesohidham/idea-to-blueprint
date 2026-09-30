@@ -166,6 +166,8 @@ section { position: relative; }
 .term-out b { color: var(--green); font-weight: 500; margin-right: 8px; }
 .term-out em { color: var(--text); font-style: normal; }
 .term-note { text-align: center; font-size: .75rem; color: var(--dim); margin-top: 16px; }
+.term-note a { color: var(--blue); }
+.term-note a:hover { text-decoration: underline; }
 
 /* Problem */
 .problem { padding: clamp(110px, 18vh, 200px) 0; }
@@ -449,20 +451,20 @@ section[id] { scroll-margin-top: 40px; }
       <a class="btn btn-ghost" href="https://github.com/iniesohidham/idea-to-blueprint">View on GitHub <span aria-hidden="true">›</span></a>
     </div>
 
-    <div class="terminal reveal" style="--d:320ms" id="terminal" role="img" aria-label="Terminal demo: the idea-to-blueprint command runs intake, research, a decision brief, writes docs/BLUEPRINT.md and lints it with zero errors.">
+    <div class="terminal reveal" style="--d:320ms" id="terminal" role="img" aria-label="Terminal demo of the real example run: intake with defaults, 30 searches and 91 sources, a decision brief with 9 epics, a 90,167-word docs/BLUEPRINT.md with 47 stories, and a clean strict lint.">
       <div class="term-bar"><i></i><i></i><i></i><span>~/new-project</span></div>
       <div class="term-body">
         <div><span class="prompt">❯ </span><span class="cmd" id="typed">/idea-to-blueprint I want a Telegram bot that helps freelancers track invoices and nudges late clients.</span><span class="caret" id="caret" aria-hidden="true"></span></div>
         <div class="term-out" id="out">
           <div class="show"><b>✓</b>Intake <em>one batch of questions, defaults accepted</em></div>
-          <div class="show"><b>✓</b>Research <em>41 live searches · 8 competitors benchmarked · every source dated</em></div>
+          <div class="show"><b>✓</b>Research <em>30 live searches · ~100 page reads · 91 sources, every one dated</em></div>
           <div class="show"><b>✓</b>Decision brief <em>drivers, shape, stack, 9 epics</em> → you replied <em>go</em></div>
-          <div class="show"><b>✓</b>Wrote <em>docs/BLUEPRINT.md</em> · 22 sections</div>
-          <div class="show"><b>✓</b>Lint <em>0 errors</em> · ready for Epic 0</div>
+          <div class="show"><b>✓</b>Wrote <em>docs/BLUEPRINT.md</em> · 90,167 words · 47 stories</div>
+          <div class="show"><b>✓</b>Lint <em>0 findings, strict</em> · ready for Epic 0</div>
         </div>
       </div>
     </div>
-    <p class="term-note">Illustrative run. Your numbers will differ.</p>
+    <p class="term-note">Numbers from a real run. <a href="https://github.com/iniesohidham/idea-to-blueprint/tree/main/examples/telegram-invoice-bot">Read the full output ›</a></p>
   </div>
 </section>
 
