@@ -14,7 +14,7 @@ npx skills add iniesohidham/idea-to-blueprint -g
 
 It is built for people who want to do **agentic engineering**, not vibe coding.
 
-**[See the landing page →](https://iniesohidham.github.io/idea-to-blueprint/)**
+**[See a full, unedited example →](examples/telegram-invoice-bot/)** · **[Landing page →](https://iniesohidham.github.io/idea-to-blueprint/)**
 
 ```
 /idea-to-blueprint  I want a Telegram bot that helps freelancers track invoices and nudges late clients.
@@ -34,6 +34,22 @@ It is built for people who want to do **agentic engineering**, not vibe coding.
 | | `CLAUDE.md`, `AGENTS.md`, `PROGRESS.md`, `DECISIONS.md` and a ready-to-paste session prompt per epic |
 
 **The result in practice:** in my own testing, working from a blueprint this skill produced, I complete about **3 epics in a single day** with Claude Code or Codex, each in its own clean session, each ending with a green quality gate and a written handoff. Your mileage depends on epic size and the model you run, but the ceiling moves a lot once the agent stops guessing.
+
+---
+
+## See a real one
+
+[`examples/telegram-invoice-bot/`](examples/telegram-invoice-bot/) is a complete run of the skill on the one-line idea above. The intake was answered with `defaults` and the brief with `go`. Nothing was cut down for the demo.
+
+| | |
+|---|---|
+| Input | "I want a Telegram bot that helps freelancers track invoices and nudges late clients." |
+| Research | 30 web searches, about 100 page reads, 91 cited sources, each dated |
+| Blueprint | 90,167 words: 9 epics, 47 stories, each with Given/When/Then criteria, edge cases, tests and a Definition of Done |
+| Decisions | A modular monolith scored against 3 ranked drivers; TypeScript over Python by a close, shown margin; every stack choice names its runner-up |
+| Lint | `PASS — no findings` |
+
+Start with the [executive summary in §1](examples/telegram-invoice-bot/BLUEPRINT.md#1-executive-summary), the [stack table in §13](examples/telegram-invoice-bot/BLUEPRINT.md#13-tech-stack-and-engineering-conventions-tech-stack), or [any epic in §17](examples/telegram-invoice-bot/BLUEPRINT.md#17-epics-and-stories-epics).
 
 ---
 
