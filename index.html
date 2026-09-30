@@ -9,7 +9,15 @@
 <meta property="og:description" content="Turn a raw idea into the one document your coding agent needs to ship, epic by epic, without guessing.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://iniesohidham.github.io/idea-to-blueprint/">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://iniesohidham.github.io/idea-to-blueprint/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="idea-to-blueprint: Tell it once. Build it right. npx skills add iniesohidham/idea-to-blueprint">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="idea-to-blueprint — Tell it once. Build it right.">
+<meta name="twitter:description" content="Turn a raw idea into the one document your coding agent needs to ship, epic by epic, without guessing.">
+<meta name="twitter:image" content="https://iniesohidham.github.io/idea-to-blueprint/og.png">
+<link rel="canonical" href="https://iniesohidham.github.io/idea-to-blueprint/">
 <meta name="theme-color" content="#000000">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23000'/%3E%3Cpath d='M18 46V18h18l10 10v18z' fill='none' stroke='%234da3ff' stroke-width='3.5' stroke-linejoin='round'/%3E%3Cpath d='M26 30h12M26 38h12' stroke='%234da3ff' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E">
 <style>
@@ -384,6 +392,11 @@ section[id] { scroll-margin-top: 40px; }
   .pill { padding: 11px 18px; }
 }
 
+/* Four install tabs on narrow phones */
+@media (max-width: 480px) {
+  .tabs button, .tabs-on span { padding-inline: 9px; font-size: .8rem; white-space: nowrap; }
+}
+
 :focus-visible { outline: 2px solid var(--blue); outline-offset: 3px; border-radius: 6px; }
 
 @media (prefers-reduced-motion: reduce) {
@@ -694,17 +707,22 @@ section[id] { scroll-margin-top: 40px; }
 
     <div class="reveal" style="--d:160ms">
       <div class="tabs" role="tablist" aria-label="Choose your tool">
-        <button role="tab" aria-selected="true" aria-controls="p-claude" id="t-claude">Claude Code</button>
+        <button role="tab" aria-selected="true" aria-controls="p-any" id="t-any">Any agent</button>
+        <button role="tab" aria-selected="false" aria-controls="p-claude" id="t-claude" tabindex="-1">Claude Code</button>
         <button role="tab" aria-selected="false" aria-controls="p-codex" id="t-codex" tabindex="-1">Codex</button>
         <button role="tab" aria-selected="false" aria-controls="p-web" id="t-web" tabindex="-1">claude.ai</button>
       </div>
 
-      <div class="panel" id="p-claude" role="tabpanel" aria-labelledby="t-claude">
-        <div class="cmdbox"><code>git clone https://github.com/iniesohidham/idea-to-blueprint ~/.claude/skills/idea-to-blueprint</code><button class="copy" type="button">Copy</button></div>
-        <p>Then, in any project: <code>/idea-to-blueprint &lt;your idea&gt;</code></p>
+      <div class="panel" id="p-any" role="tabpanel" aria-labelledby="t-any">
+        <div class="cmdbox"><code>npx skills add iniesohidham/idea-to-blueprint -g</code><button class="copy" type="button">Copy</button></div>
+        <p>Installs for Claude Code, Codex, Cursor and every other agent the <a href="https://github.com/vercel-labs/skills">skills CLI</a> finds on your machine.</p>
+      </div>
+      <div class="panel" id="p-claude" role="tabpanel" aria-labelledby="t-claude" hidden>
+        <div class="cmdbox"><code>/plugin install idea-to-blueprint --marketplace iniesohidham/idea-to-blueprint</code><button class="copy" type="button">Copy</button></div>
+        <p>Paste inside Claude Code (v2.1.275+). Then: <code>/idea-to-blueprint:idea-to-blueprint &lt;your idea&gt;</code></p>
       </div>
       <div class="panel" id="p-codex" role="tabpanel" aria-labelledby="t-codex" hidden>
-        <div class="cmdbox"><code>git clone https://github.com/iniesohidham/idea-to-blueprint ~/.agents/skills/idea-to-blueprint</code><button class="copy" type="button">Copy</button></div>
+        <div class="cmdbox"><code>npx skills add iniesohidham/idea-to-blueprint -g -a codex</code><button class="copy" type="button">Copy</button></div>
         <p>Then, in the CLI or IDE extension: <code>$idea-to-blueprint &lt;your idea&gt;</code></p>
       </div>
       <div class="panel" id="p-web" role="tabpanel" aria-labelledby="t-web" hidden>
