@@ -20,7 +20,7 @@ The blueprint is one markdown file. Sections are numbered and appear in this ord
 |---|---|---|
 | Source | `S-nn` | S-14 |
 | Persona | `P<n>` (anti-persona `AP<n>`) | P2, AP1 |
-| Goal / metric | `G<n>` / `M<n>` | G3, M3.1 |
+| Goal / metric | `G<n>` / `M-<n>` or `M-<n>.<n>` | G3, M-3.1, M-12 |
 | Flow | `F-nn` | F-03 |
 | Screen / surface | `SCR-nn` (never `S-nn`, which is a source) | SCR-07 |
 | Copy line | `CP-<screen>-<n>` | CP-SCR07-3 |
@@ -47,7 +47,7 @@ IDs never change once assigned; if a story is dropped, its ID is retired with a 
 Title, version, date, author, target agents (Claude Code / Codex), model/effort used for research. Then:
 - Who reads what: humans read 1–7, 19–21; build sessions read 12–18 plus the epic in play; both read the Glossary.
 - The language convention (prose vs machine text vs product copy).
-- The evidence legend (all five tags).
+- The evidence legend: every tag in `research-protocol.md` §2, one table row each. The legend names the tags rather than using them, so end each legend row with `<!-- lint-ignore -->`; otherwise the linter reads `[UNKNOWN → OQ-nn]` as an unknown with no Open Question and counts `[UNVERIFIED]` as used.
 - Status of this document: DRAFT / APPROVED, and the rule that changes go through the Amendments log (section 18).
 - Table of contents.
 
@@ -67,12 +67,12 @@ The user's idea as written (quoted verbatim in their language, short). Your inte
 For each `P<n>` (3–5 typical): name and one-line role; context (where/when/on what device/network they use it); goals and the outcome they want; jobs-to-be-done; current pains and workarounds; tech comfort and reading tolerance; language, register and formality expectation (drives copy voice); accessibility considerations; trust concerns; key scenarios (2–4 short narratives that later map to flows); success looks like (what they say when it works). Anti-personas `AP<n>`: who we do not design for and why. End with a persona × capability matrix (which persona needs what).
 
 ### 6. Goals, non-goals and success metrics (Goals & Metrics) — 1–2 pages
-Goals `G<n>` as measurable outcomes tied to personas. Metrics `M<n.m>`: leading and lagging, definition, measurement method (event, query, survey), target with `[ASSUMED]` when hypothetical, and which epic instruments it. Non-goals with a one-clause reason each.
+Goals `G<n>` as measurable outcomes tied to personas. Metrics `M-<n>.<n>` (M-3.1 serves G3): leading and lagging, definition, measurement method (event, query, survey), target with `[ASSUMED]` when hypothetical, and which epic instruments it. Non-goals with a one-clause reason each.
 
 ### 7. User flows (Flows) — 3–8 pages
 See `design-minimal.md` §3 for the format. One `F-nn` per core job, per persona where they differ. Each flow: trigger, preconditions, numbered steps (screen, user action, system response, copy IDs), decision points, failure branches with recovery, exit, metric. Include first-run, core loop, payment (if any), recovery/re-authentication, admin flows, and account deletion.
 
-### 8. Information architecture and screen inventory (Screens) — 3–8 pages
+### 8. Screen inventory and navigation (Screens) — 3–8 pages
 Navigation model; screen table `SCR-nn | purpose | personas | entry points | components | states (empty/loading/error/success/offline) | copy IDs | edge cases`. A one-paragraph description per screen of what is on it and what the single primary action is.
 
 ### 9. Design direction (Design) — 2–4 pages
@@ -131,7 +131,7 @@ Global, cross-cutting edge cases `EC-<cat>-nn` grouped by category from `edge-ca
 16.1 Epic order table: `Order | Epic | Goal | Depends on | Stories | Size (S/M/L) | Why now`. 16.2 Sprint table: `Sprint | Epics | Milestone (e.g., "closed beta") | Exit criteria`. One epic = one session by default; a sprint = 1–3 epics ending in something releasable or demonstrable. 16.3 Critical path and what can be reordered without risk.
 
 ### 17. Epics and stories (Epics) — 20–60 pages
-Preceded by one line stating that everything from here is in English for the coding agent. Then `## Epic 00 — Foundation` through the last epic, each following the epic template in `stories-ac-tests.md` §5. Epic 00 always contains the repo bootstrap, tooling, `check`, CI, docs files (BLUEPRINT/PROGRESS/DECISIONS/AGENTS/CLAUDE), environment templates, a hello-world vertical slice with one unit, one integration and one e2e smoke test, and the deployment skeleton to staging.
+Preceded by one line stating that everything from here is in English for the coding agent. Then `## Epic 00 — Foundation` through the last epic, each following the epic template in `stories-ac-tests.md` §5. Epic 00 always contains the repo bootstrap, tooling, `check`, CI, docs files (BLUEPRINT/PROGRESS/DECISIONS/REVIEW-CHECKLIST/AGENTS/CLAUDE), environment templates, a hello-world vertical slice with one unit, one integration and one e2e smoke test, and the deployment skeleton to staging.
 
 ### 18. Session protocol for Claude Code / Codex (Session Protocol) — 2–4 pages
 The full per-session runbook from `session-protocol.md`, the PROGRESS.md and DECISIONS.md formats, the Amendments log (how the blueprint itself gets changed from a build session), termination rules, recovery from a crashed session, and the `[VERIFY-AT-BUILD]` re-check rule.
@@ -152,7 +152,7 @@ Term | definition | Persian/English equivalent | where used. Includes UI termino
 One copy-paste prompt per epic, generated from `assets/session-prompt.md`, with the epic ID and the section numbers filled in.
 
 ### Appendix B — Files to create in Epic 0 (Appendix Epic 0 Files)
-The literal content of `docs/PROGRESS.md`, `docs/DECISIONS.md`, `AGENTS.md`, `CLAUDE.md`, `.env.example`, and the `check` script for this product, so Epic 0 copies rather than invents.
+The literal content of `docs/PROGRESS.md`, `docs/DECISIONS.md`, `docs/REVIEW-CHECKLIST.md` (the 14.4 checklist), `AGENTS.md`, `CLAUDE.md`, `.env.example`, and the `check` script for this product, so Epic 0 copies rather than invents.
 
 ## 4. Table formats (copy exactly)
 

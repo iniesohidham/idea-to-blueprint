@@ -1,7 +1,7 @@
 {
   "name": "idea-to-blueprint",
   "displayName": "Idea to Blueprint",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Raw idea in, evidence-backed build blueprint out: intake, live web research, architecture and a pinned stack, then epics, stories and Given/When/Then acceptance criteria your coding agent builds one epic per fresh session.",
   "author": {
     "name": "iniesohidham",

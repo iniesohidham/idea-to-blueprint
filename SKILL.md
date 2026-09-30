@@ -100,7 +100,7 @@ Read `references/blueprint-template.md` and keep it open; it has the full sectio
 Writing mechanics that matter:
 
 - **Write in chunks.** Create the file with the cover and table of contents, then append one major section per write operation. A hundred-page document written in one output gets truncated or rushed; a document written section by section keeps its quality to the end.
-- **IDs everywhere.** Personas `P1…`, flows `F-01…`, screens `S-01…`, copy lines `CP-<screen>-<n>`, entities `ENT-…`, epics `E00…`, stories `E03-S02`, criteria `AC-1…` inside a story, open questions `OQ-01…`, edge cases `EC-<cat>-<n>`. The linter and the future build sessions rely on them.
+- **IDs everywhere.** Personas `P1…`, flows `F-01…`, screens `SCR-01…`, copy lines `CP-<screen>-<n>`, entities `ENT-…`, epics `E00…`, stories `E03-S02`, criteria `AC-1…` inside a story, open questions `OQ-01…`, edge cases `EC-<cat>-<n>`. The linter and the future build sessions rely on them.
 - **Machine-facing text in English, human-facing prose in the user's language** (details in Language convention). Every heading carries an English anchor so the linter and the coding agent can find sections regardless of prose language.
 - **Depth beats brevity here.** The user has said a 100-page file is fine. The right length is whatever leaves no story, screen, copy line or edge case unspecified. Cut repetition, not content.
 - **Every decision names its losers and its price.** Stack, architecture style, design system, auth model, data model: state the alternatives considered, the deciding reason, and *what the rejected option would have bought you*. A decision with no stated cost was not a decision.
@@ -122,7 +122,7 @@ Then do the human pass the linter cannot: read the Executive summary, one person
 Deliver:
 
 - In a chat surface with file tools: save under the outputs directory as `<product>-blueprint.md`, present it with the file-presenting tool.
-- In Claude Code / Codex: save to `docs/BLUEPRINT.md` in the repo (or the path the user names) and also create `docs/PROGRESS.md`, `docs/DECISIONS.md` and `AGENTS.md` + `CLAUDE.md` from `assets/`, filled in for this product, so Epic 0 can start immediately.
+- In Claude Code / Codex: save to `docs/BLUEPRINT.md` in the repo (or the path the user names) and also create `docs/PROGRESS.md`, `docs/DECISIONS.md` and `AGENTS.md` + `CLAUDE.md` from `assets/`, plus `docs/REVIEW-CHECKLIST.md` (the blueprint's section 14.4 checklist, verbatim), all filled in for this product, so Epic 0 can start immediately.
 - Wrap-up message: 5–10 lines. Point at the Assumptions table and the Open Questions, name the two or three things you are least sure about, and tell the user the next step is to open a fresh coding session and paste the Epic 0 session prompt from the document's appendix. Do not re-summarise the document.
 
 ## Language convention

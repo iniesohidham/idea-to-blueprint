@@ -7,7 +7,9 @@ Usage:
 Exit code 0 = no errors (warnings may remain), 1 = errors found (or warnings with --strict).
 
 What it checks (E = error, W = warning):
-  E  required top-level sections present (by English anchor in a `## ` heading)
+  E  required top-level sections present (by English anchor in a `## ` heading: a heading whose
+     parenthesized anchor or title *is* the anchor wins over one that merely contains it; headings
+     inside fenced code blocks are ignored everywhere)
   E  no placeholder text (TODO, TBD, TBA, FIXME, XXX, lorem, ???, [insert, to be defined/decided)
   E  at least one `## Epic nn — Title` and Epic 00 present
   E  each epic has **Definition of Done**;   W  each epic has **Session handoff checklist**
@@ -15,27 +17,34 @@ What it checks (E = error, W = warning):
   E  each story has **Acceptance Criteria**, **Edge cases**, **Tests**, at least one `AC-n`, and names a persona `P<n>`
   W  each story has **Story**, **Context**, **Scope**, **Tasks**, **Story DoD**
   E  no "As a user" stories
-  E  every `[UNKNOWN → OQ-nn]` has a matching OQ-nn row in the Open Questions section; bare `[UNKNOWN]` without an OQ is an error
-  E  every table body row in the Tech Stack section carries [VERIFIED / [ASSUMED / [STATED (or [UNVERIFIED], which also raises W)
+  E  every `[UNKNOWN → OQ-nn]` has a matching OQ-nn row in the Open Questions section; `[UNKNOWN]` without a numbered OQ is an error
+  E  every body row of the stack table carries [VERIFIED / [ASSUMED / [STATED (or [UNVERIFIED], which also
+     raises W). Stack tables are the Tech Stack tables whose header has a Layer, Technology/Choice, version
+     or Runner-up column (the first table in the section if none does); scoring and forbidden-choice
+     tables are not checked
   E  every S-nn cited in a [VERIFIED …] tag exists in the Sources section;   W  fewer than 5 URLs in Sources
-  E  every defined persona P<n> is used by at least one story
+  E  every defined persona P<n> is used by at least one story (P50/P75/P90/P95/P99/P999 are percentiles)
   W  copy IDs (CP-…) referenced in stories are defined in the Copy section
   W  dangling story references (Enn-Snn mentioned but not defined)
   W  `## ` headings with non-ASCII text carry an ASCII anchor in parentheses
-  W  vague adjectives inside AC lines (properly, appropriately, fast, quickly, easily, seamless, user-friendly, intuitive)
+  W  vague adjectives inside AC lines (properly, appropriately, fast, quickly, easily, seamless, user-friendly, intuitive);
+     terms of art such as "fail fast" and "fast-forward" are not vague
   W  Session Protocol section mentions an Amendments log;   W  an appendix with session prompts exists
   E  Architecture section defines drivers AD-n and mentions fitness functions;   W  <3 drivers, drivers
      with no number in them, no explicit non-drivers
   E  every AD-n referenced outside the Architecture section is defined inside it
   W  Tech Stack table has a runner-up column (a choice with no stated cost was not a decision)
   E  Quality section names a `check` command and embeds >=10 review-checklist items of the form `[ ] …`
-  W  Quality section names critical e2e paths, says something about mutation testing, has M-nn metric
-     rows, and lists anti-metrics
+  W  Quality section names critical e2e paths, says something about mutation testing, has metric
+     rows (M-n or M-n.n), and lists anti-metrics
   E  no metric row defines an output-per-person metric (lines of code, commits/PRs/diffs per engineer,
-     story points as productivity);   W  coverage appearing as a metric without the word "floor"
+     story points as productivity);   W  coverage stated as a metric target (the metric's name, or next to
+     target/goal/≥/%) rather than as a floor or gate
 
-Add `<!-- lint-ignore -->` at the end of a line to suppress placeholder/adjective findings on that line
-(e.g., the rule sentence "No TODO or TBD anywhere" in the How-to-use section).
+Add `<!-- lint-ignore -->` at the end of a line to suppress that line's placeholder, adjective,
+evidence-tag ([UNKNOWN], [UNVERIFIED], [VERIFIED … S-nn]), driver-target and metric-row findings. Use it
+on lines that name a rule or a tag instead of using it: the sentence "No TODO or TBD anywhere" and every
+row of the evidence legend in the How-to-use section.
 """
 from __future__ import annotations
 
@@ -58,7 +67,8 @@ EPIC_HEADING_RE = re.compile(r"^## Epic (\d{2})\s*[—–-]\s*(.+?)\s*$")
 STORY_HEADING_RE = re.compile(r"^### (E(\d{2})-S(\d{2}))\s*[—–-]\s*(.+?)\s*$")
 STORY_REF_RE = re.compile(r"\bE\d{2}-S\d{2}\b")
 AC_LINE_RE = re.compile(r"^\s*[-*]\s*AC-\d+", re.IGNORECASE)
-PERSONA_REF_RE = re.compile(r"(?<![A-Za-z])P(\d+)\b")
+# P50/P75/P90/P95/P99/P999 are percentiles ("P95 latency"), never personas.
+PERSONA_REF_RE = re.compile(r"(?<![A-Za-z])P(?!(?:50|75|90|95|99|999)\b)(\d+)\b")
 UNKNOWN_RE = re.compile(r"\[UNKNOWN([^\]]*)\]")
 OQ_IN_UNKNOWN_RE = re.compile(r"OQ-(\d+)")
 VERIFIED_SOURCE_RE = re.compile(r"\[VERIFIED[^\]]*?\bS-(\d+)")
@@ -69,6 +79,11 @@ EVIDENCE_TAG_RE = re.compile(r"\[(VERIFIED|ASSUMED|STATED|UNVERIFIED)\b")
 UNVERIFIED_RE = re.compile(r"\[UNVERIFIED\]")
 VAGUE_RE = re.compile(
     r"\b(properly|appropriately|fast|quickly|easily|seamless(?:ly)?|user-friendly|intuitive(?:ly)?)\b",
+    re.IGNORECASE,
+)
+# Terms of art that contain a vague word but name something exact.
+VAGUE_OK_RE = re.compile(
+    r"\bfail(?:s|ed|ing)?[- ]fast\b|\bfast[- ]forward(?:s|ed|ing)?\b|\bfast-check\b|\bfast path\b",
     re.IGNORECASE,
 )
 AS_A_USER_RE = re.compile(r"\bAs an? user\b", re.IGNORECASE)
@@ -84,7 +99,20 @@ BANNED_METRIC_RE = re.compile(
     r"|story points? (?:per|as a measure|completed per)|velocity per",
     re.IGNORECASE,
 )
-COVERAGE_TARGET_RE = re.compile(r"coverage", re.IGNORECASE)
+COVERAGE_RE = re.compile(r"coverage", re.IGNORECASE)
+COVERAGE_FLOOR_RE = re.compile(
+    r"\bfloors?\b|\bgat(?:e|es|ed|ing)\b|\bthresholds?\b|\bminimum\b|must not (?:drop|fall)|never (?:drop|fall)",
+    re.IGNORECASE,
+)
+COVERAGE_GOAL_RE = re.compile(
+    r"coverage[^|;]{0,40}?(?:target|goal|≥|>=|at least|\d\s*%)"
+    r"|(?:target|goal|raise|increase|improve|reach|maximi[sz]e)[^|;]{0,40}?coverage",
+    re.IGNORECASE,
+)
+FENCE_RE = re.compile(r"^\s*(`{3,}|~{3,})")
+HEADING_NUMBER_RE = re.compile(r"^(?:\d+(?:\.\d+)*\.?|[A-Z]\.)\s+")
+PAREN_RE = re.compile(r"\(([^()]*)\)")
+RUNNER_UP_RE = re.compile(r"runner[\s-]*up", re.IGNORECASE)
 LINT_IGNORE = "<!-- lint-ignore -->"
 
 
@@ -107,8 +135,26 @@ class Section:
     end: int    # exclusive
 
 
-def level2_sections(lines: list[str]) -> list[Section]:
-    idx = [i for i, l in enumerate(lines) if l.startswith("## ")]
+def fenced_lines(lines: list[str]) -> list[bool]:
+    """True for every line of a fenced code block, fences included. Headings and tables inside a fence
+    are examples (a handoff summary, a file for Appendix B), not structure."""
+    mask = [False] * len(lines)
+    fence = ""
+    for i, l in enumerate(lines):
+        m = FENCE_RE.match(l)
+        if not fence:
+            if m:
+                fence, mask[i] = m.group(1), True
+            continue
+        mask[i] = True
+        # A fence closes on the same character, at least as long, with nothing after it.
+        if m and m.group(1)[0] == fence[0] and len(m.group(1)) >= len(fence) and not l.strip().strip(fence[0]):
+            fence = ""
+    return mask
+
+
+def level2_sections(lines: list[str], fenced: list[bool]) -> list[Section]:
+    idx = [i for i, l in enumerate(lines) if l.startswith("## ") and not fenced[i]]
     sections = []
     for n, i in enumerate(idx):
         end = idx[n + 1] if n + 1 < len(idx) else len(lines)
@@ -117,12 +163,24 @@ def level2_sections(lines: list[str]) -> list[Section]:
 
 
 def find_section(sections: list[Section], anchor: str) -> Section | None:
+    """Prefer a heading whose parenthesized anchor or title *is* the anchor, then one whose title starts
+    with it, and only then one that merely contains it — so 'Architecture' resolves to
+    '## 12. Architecture' and not to an earlier '## 8. Information architecture … (Screens)'."""
     a = anchor.lower()
-    for s in sections:
-        if EPIC_HEADING_RE.match("## " + s.title):
-            continue
-        if a in s.title.lower():
-            return s
+    candidates = [s for s in sections if not EPIC_HEADING_RE.match("## " + s.title)]
+
+    def title(s: Section) -> str:  # heading text without its number and parenthesized anchors
+        return PAREN_RE.sub("", HEADING_NUMBER_RE.sub("", s.title)).strip().lower()
+
+    for matches in (
+        lambda s: a in (p.strip().lower() for p in PAREN_RE.findall(s.title)),
+        lambda s: title(s) == a,
+        lambda s: re.match(re.escape(a) + r"\b", title(s)) is not None,
+        lambda s: a in s.title.lower(),
+    ):
+        for s in candidates:
+            if matches(s):
+                return s
     return None
 
 
@@ -130,23 +188,46 @@ def block_text(lines: list[str], start: int, end: int) -> str:
     return "\n".join(lines[start:end])
 
 
-def table_body_rows(lines: list[str], start: int, end: int) -> list[tuple[int, str]]:
-    """Return (line_no, row) for table rows that are neither header nor separator."""
-    rows = []
-    in_table = False
-    header_seen = False
+def tables(
+    lines: list[str], start: int, end: int, fenced: list[bool]
+) -> list[tuple[int, list[str], list[tuple[int, str]]]]:
+    """Return (header index, lower-cased header cells, [(line_no, body row)]) for each table outside fences."""
+    found: list[tuple[int, list[str], list[tuple[int, str]]]] = []
+    current = None
     for i in range(start, end):
         l = lines[i].strip()
-        if l.startswith("|"):
-            if not in_table:
-                in_table, header_seen = True, True  # first row of a table is its header
-                continue
-            if re.match(r"^\|[\s:\-|]+\|$", l):
-                continue  # separator
-            rows.append((i + 1, l))
-        else:
-            in_table, header_seen = False, False
-    return rows
+        if fenced[i] or not l.startswith("|"):
+            current = None
+            continue
+        if current is None:  # first row of a table is its header
+            current = (i, [c.strip().lower() for c in l.strip("|").split("|")], [])
+            found.append(current)
+        elif not re.match(r"^\|[\s:\-|]+\|$", l):  # skip the separator
+            current[2].append((i + 1, l))
+    return found
+
+
+def is_stack_header(cells: list[str]) -> bool:
+    """The stack table is recognised by its header (`| Layer | Technology | Pinned version | … | Runner-up … |`),
+    not its position: a scoring table or forbidden-choices table often comes first and has no evidence column."""
+    return any(
+        c.startswith("layer") or RUNNER_UP_RE.search(c) or "version" in c or c in ("technology", "choice")
+        for c in cells
+    )
+
+
+def coverage_as_goal(line: str) -> bool:
+    """True when a metric line states coverage as the thing to raise — the metric's own name, or coverage
+    next to a target — rather than as a regression floor or a gate component."""
+    if not COVERAGE_RE.search(line) or COVERAGE_FLOOR_RE.search(line):
+        return False
+    if COVERAGE_GOAL_RE.search(line):
+        return True
+    cells = [c.strip() for c in line.strip().strip("|").split("|")]
+    for n, cell in enumerate(cells[:-1]):
+        if METRIC_ROW_RE.search(cell):
+            return bool(COVERAGE_RE.search(cell + " " + cells[n + 1]))  # the metric's own name
+    return False
 
 
 def main(argv: list[str]) -> int:
@@ -158,7 +239,8 @@ def main(argv: list[str]) -> int:
     with open(path, encoding="utf-8") as f:
         lines = f.read().splitlines()
     f_ = Findings()
-    sections = level2_sections(lines)
+    fenced = fenced_lines(lines)
+    sections = level2_sections(lines, fenced)
 
     # 1. Required sections
     for anchor in REQUIRED_SECTIONS_ERROR:
@@ -176,7 +258,7 @@ def main(argv: list[str]) -> int:
         if m:
             f_.err(i, f"Placeholder text '{m.group(0)}' — decide it or route to an [UNKNOWN → OQ-nn]")
         if AC_LINE_RE.match(l):
-            v = VAGUE_RE.search(l)
+            v = VAGUE_RE.search(VAGUE_OK_RE.sub("", l))
             if v:
                 f_.warn(i, f"Vague word '{v.group(0)}' in an acceptance criterion — replace with a number or observable result")
         if AS_A_USER_RE.search(l):
@@ -202,7 +284,7 @@ def main(argv: list[str]) -> int:
         if "**Session handoff checklist**" not in text:
             f_.warn(sec.start + 1, f"Epic {epic_no:02d} has no **Session handoff checklist**")
         # stories inside this epic
-        heads = [i for i in range(sec.start + 1, sec.end) if lines[i].startswith("### ")]
+        heads = [i for i in range(sec.start + 1, sec.end) if lines[i].startswith("### ") and not fenced[i]]
         if not heads:
             f_.err(sec.start + 1, f"Epic {epic_no:02d} has no stories ('### Enn-Snn — Title')")
         for n, i in enumerate(heads):
@@ -245,23 +327,32 @@ def main(argv: list[str]) -> int:
     oq_sec = find_section(sections, "Open Questions")
     oq_text = block_text(lines, oq_sec.start, oq_sec.end) if oq_sec else ""
     for i, l in enumerate(lines, 1):
+        if LINT_IGNORE in l:
+            continue
         for m in UNKNOWN_RE.finditer(l):
             oqs = OQ_IN_UNKNOWN_RE.findall(m.group(1))
             if not oqs:
-                f_.err(i, "[UNKNOWN] without an OQ reference — use '[UNKNOWN → OQ-nn]'")
+                f_.err(
+                    i,
+                    f"'{m.group(0)}' without a numbered OQ reference — use '[UNKNOWN → OQ-07]' with a row in "
+                    f"Open Questions (a legend row that only names the tag ends with {LINT_IGNORE})",
+                )
             for q in oqs:
                 if oq_sec and not re.search(rf"\bOQ-{q}\b", oq_text):
                     f_.err(i, f"OQ-{q} referenced but not present in the Open Questions section")
 
-    # 5. Tech stack evidence
+    # 5. Tech stack evidence — only the stack table's rows; scoring and forbidden-choice tables are not checked
     ts = find_section(sections, "Tech Stack")
+    stack_tables: list[tuple[int, list[str], list[tuple[int, str]]]] = []
     if ts:
-        rows = table_body_rows(lines, ts.start, ts.end)
-        if not rows:
-            f_.err(ts.start + 1, "Tech Stack section has no table rows")
-        for ln, row in rows:
-            if not EVIDENCE_TAG_RE.search(row):
-                f_.err(ln, "Tech Stack table row without an evidence tag ([VERIFIED …] / [ASSUMED …] / [STATED])")
+        ts_tables = tables(lines, ts.start, ts.end, fenced)
+        stack_tables = [t for t in ts_tables if is_stack_header(t[1])] or ts_tables[:1]
+        if not any(rows for _, _, rows in stack_tables):
+            f_.err(ts.start + 1, "Tech Stack section has no stack table rows ('| Layer | Technology | Pinned version | … |')")
+        for _, _, rows in stack_tables:
+            for ln, row in rows:
+                if not EVIDENCE_TAG_RE.search(row):
+                    f_.err(ln, "Tech Stack table row without an evidence tag ([VERIFIED …] / [ASSUMED …] / [STATED])")
 
     # 6. Sources
     src = find_section(sections, "Sources")
@@ -272,7 +363,7 @@ def main(argv: list[str]) -> int:
         if len(urls) < 5:
             f_.warn(src.start + 1, f"Only {len(urls)} URL(s) in Sources — deep research normally yields far more")
         for i, l in enumerate(lines, 1):
-            if src.start < i - 1 < src.end:
+            if src.start < i - 1 < src.end or LINT_IGNORE in l:
                 continue
             for s_id in VERIFIED_SOURCE_RE.findall(l):
                 if s_id not in defined_sources:
@@ -312,7 +403,7 @@ def main(argv: list[str]) -> int:
         f_.warn(None, "No appendix with 'Session Prompts' — the user needs one copy-paste prompt per epic")
 
     # 11. UNVERIFIED tags (only legitimate when web tools were unavailable)
-    unverified = sum(len(UNVERIFIED_RE.findall(l)) for l in lines)
+    unverified = sum(len(UNVERIFIED_RE.findall(l)) for l in lines if LINT_IGNORE not in l)
     if unverified:
         f_.warn(None, f"{unverified} [UNVERIFIED] tag(s) — acceptable only with the no-web-access warning on the cover; the first build session must re-verify each")
 
@@ -370,15 +461,10 @@ def main(argv: list[str]) -> int:
                     f_.err(i, f"AD-{ad} is referenced but never defined as a driver in the Architecture section")
 
     # 13. Tech stack table shape — every row must name what the runner-up would have bought
-    if ts:
-        header = ""
-        for i in range(ts.start, min(ts.end, len(lines))):
-            if lines[i].lstrip().startswith("|") and "---" not in lines[i]:
-                header = lines[i].lower()
-                break
-        if header and "runner" not in header:
+    for header_i, cells, _ in stack_tables:
+        if not any("runner" in c for c in cells):
             f_.warn(
-                ts.start + 1,
+                header_i + 1,
                 "Tech Stack table has no runner-up column — a choice with no stated cost was not a decision",
             )
 
@@ -411,7 +497,7 @@ def main(argv: list[str]) -> int:
                 "or state that no maintained one exists",
             )
         if not METRIC_ROW_RE.search(q_text):
-            f_.warn(q.start + 1, "Quality section has no metrics table rows (M-nn) — nothing will be measured")
+            f_.warn(q.start + 1, "Quality section has no metrics table rows (M-n or M-n.n) — nothing will be measured")
         if "anti-metric" not in q_lower and "will not measure" not in q_lower and "not measure" not in q_lower:
             f_.warn(
                 q.start + 1,
@@ -429,10 +515,10 @@ def main(argv: list[str]) -> int:
                 f"Metric row defines '{m.group(0)}' — output-per-person metrics are gamed the moment they "
                 "become targets; measure the system, not the author",
             )
-        if COVERAGE_TARGET_RE.search(l) and "floor" not in l.lower():
+        if coverage_as_goal(l):
             f_.warn(
                 i,
-                "Coverage appears as a metric without the word 'floor' — state it as a regression floor, "
+                "Coverage stated as a metric target — state it as a regression floor (a gate in `check`), "
                 "never as a target to raise",
             )
 

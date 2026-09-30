@@ -31,7 +31,7 @@ It is built for people who want to do **agentic engineering**, not vibe coding.
 | A "go" on a one-screen decision brief | Epics → stories → Given/When/Then acceptance criteria → tests → Definition of Done, in build order |
 | | Every user-facing string written in advance, in copy tables, by ID |
 | | An edge-case register across 21 categories (auth, payments, concurrency, offline, RTL, security, a11y…) |
-| | `CLAUDE.md`, `AGENTS.md`, `PROGRESS.md`, `DECISIONS.md` and a ready-to-paste session prompt per epic |
+| | `CLAUDE.md`, `AGENTS.md`, `PROGRESS.md`, `DECISIONS.md`, `REVIEW-CHECKLIST.md` and a ready-to-paste session prompt per epic |
 
 **The result in practice:** in my own testing, working from a blueprint this skill produced, I complete about **3 epics in a single day** with Claude Code or Codex, each in its own clean session, each ending with a green quality gate and a written handoff. Your mileage depends on epic size and the model you run, but the ceiling moves a lot once the agent stops guessing.
 
@@ -140,7 +140,7 @@ What happens next:
 4. **Writing.** The blueprint is written section by section so quality holds to the last page.
 5. **Lint.** `scripts/lint_blueprint.py` checks the structural guarantees the build sessions depend on. Errors are fixed before delivery.
 
-In Claude Code or Codex the skill saves `docs/BLUEPRINT.md` and creates `docs/PROGRESS.md`, `docs/DECISIONS.md`, `AGENTS.md` and `CLAUDE.md` alongside it. On claude.ai you get `<product>-blueprint.md`; put it in an empty project folder as `docs/BLUEPRINT.md`.
+In Claude Code or Codex the skill saves `docs/BLUEPRINT.md` and creates `docs/PROGRESS.md`, `docs/DECISIONS.md`, `docs/REVIEW-CHECKLIST.md`, `AGENTS.md` and `CLAUDE.md` alongside it. On claude.ai you get `<product>-blueprint.md`; put it in an empty project folder as `docs/BLUEPRINT.md`.
 
 ### 3. Prototype it in one file (before any epic)
 

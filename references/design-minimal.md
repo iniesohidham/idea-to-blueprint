@@ -48,7 +48,7 @@ Don't (in v1 unless a persona demands it): carousels for content that matters, h
 **Decision points** — at step n: if <condition> → branch A (steps …) else → branch B.
 **Failure branches** — for each step: what can fail (from edge cases), what the user sees (copy IDs), how they recover, what is persisted.
 **Exit** — where the flow ends and what state the system is in.
-**Success metric** — M-x.y; time-to-complete target `[ASSUMED]` if hypothetical.
+**Success metric** — M-n.n; time-to-complete target `[ASSUMED]` if hypothetical.
 **Benchmark note** — which best-in-class behaviour this adopts (S-nn) and what we do differently.
 ```
 

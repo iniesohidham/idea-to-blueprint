@@ -129,10 +129,10 @@ Epic 00 is where "no room for error" is manufactured. Its stories (builder perso
 1. Repository init with the chosen layout; language/runtime version pinned (version file); package manager lockfile committed.
 2. Formatter, linter (strict), typechecker (strict flags), test runner configured; `check` command that runs them all and fails on any warning class you decide is an error; documented expected runtime. Also in `check` from day one: coverage floor, dependency/vulnerability audit, secret scanning, and schema-drift check — every gate component listed in blueprint section 14.2 that applies.
 2b. **Module skeleton and fitness functions**: the empty modules from the architecture's module map, plus the architecture tests that enforce the dependency-direction and ownership rules, failing the build on violation. These exist *before* there is any feature code to violate them; retrofitting boundaries after three epics does not work.
-2c. **The review checklist** (blueprint section 14.4) committed to the repo at a fixed path and referenced from `AGENTS.md`/`CLAUDE.md`, so it is in every future session's context.
+2c. **The review checklist** (blueprint section 14.4) committed to the repo at `docs/REVIEW-CHECKLIST.md` and referenced from `AGENTS.md`/`CLAUDE.md`, so it is in every future session's context.
 3. Test layout with one example unit test, one integration test against a real test database (containerised or local), one e2e smoke test; factories/fixtures pattern established. Mutation testing configured on the critical modules if a maintained tool exists for the stack (blueprint section 14.3 says which, or says none exists).
 4. CI running `check` on every push and blocking merge on red; branch protection configured so the gate cannot be bypassed.
-5. `docs/BLUEPRINT.md` (this document), `docs/PROGRESS.md`, `docs/DECISIONS.md`, `AGENTS.md` and `CLAUDE.md` created from Appendix B; `.env.example` with every variable and a one-line meaning; secrets policy.
+5. `docs/BLUEPRINT.md` (this document), `docs/PROGRESS.md`, `docs/DECISIONS.md`, `docs/REVIEW-CHECKLIST.md`, `AGENTS.md` and `CLAUDE.md` created from Appendix B; `.env.example` with every variable and a one-line meaning; secrets policy.
 6. Configuration loading with validation at startup (fail fast on missing/invalid env).
 7. Logging with a structured logger, request/correlation ID, PII redaction rule; error-tracking hook (verified service or self-hosted); health endpoint.
 8. Database with migration tooling; first migration; seed script for fixtures.

@@ -14,7 +14,8 @@ Long agent sessions accumulate drift: forgotten constraints, half-remembered dec
 docs/BLUEPRINT.md      the full blueprint (this document)
 docs/PROGRESS.md       state: epic/story status, AC evidence, deviations, next preconditions
 docs/DECISIONS.md      decision records DR-nn (from the blueprint + those made during sessions)
-AGENTS.md              Codex entry point: points at the three docs and the protocol
+docs/REVIEW-CHECKLIST.md  the review checklist from BLUEPRINT §14.4, walked for every story
+AGENTS.md              Codex entry point: points at the four docs and the protocol
 CLAUDE.md              Claude Code entry point: same content
 .env.example           every variable with a one-line meaning
 <check command>        one command that runs format + lint + typecheck + tests (documented in BLUEPRINT §13.4)
